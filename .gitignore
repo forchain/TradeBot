@@ -16,6 +16,7 @@
 .idea/modules.xml
 .idea/workspace.xml
 .idea/vcs.xml
+.idea/
 main.go
 tests/
 .idea/dictionaries/
