@@ -31,6 +31,8 @@ type BinanceEx struct {
 	opts []OptRecord
 
 	initAssets model.Balance
+	initBase model.Balance
+
 	initExRate float64
 }
 func (p *BinanceEx) Init(){
@@ -404,10 +406,13 @@ func (p *BinanceEx)getAccount() error{
 
 	if len(p.initAssets.Currency)<=0 {
 		balance:=p.account.getBalance(p.CurTP.GetQuote())
-		if balance!=nil {
+		balanceB:=p.account.getBalance(p.CurTP.GetBase())
+		if balance!=nil&&balanceB!=nil {
 			p.initAssets=model.Balance(*balance)
+			p.initBase=model.Balance(*balanceB)
 		}else{
 			p.initAssets=model.Balance{p.CurTP.GetQuote(),0,0}
+			p.initBase=model.Balance{p.CurTP.GetBase(),0,0}
 		}
 		p.initExRate=getUSDToCNY()
 		log.Infof("当前人民币汇率：$1 美元=￥%f 人民币",p.initExRate)

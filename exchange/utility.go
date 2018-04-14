@@ -546,7 +546,12 @@ func PrintAnalysisInfo(p *BinanceEx){
 		}
 		showStr+="\n"
 		//
+		startOptTime:=getOptPreTime(p.CurTP.OptFrequency,p.startTime)
+		startOptRecord:=p.curRecords.getRecordByTime(startOptTime)
+
 		firstA:=p.initAssets.Free+p.initAssets.Frozen
+		firstB:=p.initBase.Free+p.initBase.Frozen
+		firstBMoney:=startOptRecord.Close*firstB
 
 		var totalFee float64=0
 		balance:=p.account.getBalance(p.CurTP.GetQuote())
@@ -555,7 +560,7 @@ func PrintAnalysisInfo(p *BinanceEx){
 			baV:=p.account.getBalanceByTime(x.Time)+firstA
 			totalFee+=x.Commission
 			showStr+=fmt.Sprintf("%16d%7s%20g%20.16g%20g%20g%20.16g%20.10g%20.10g%22s\n",x.ID,x.Type,x.Amount,x.Price,
-				x.Commission,ownB,ownB*x.Price,baV,baV+ownB*x.Price-firstA,
+				x.Commission,ownB,ownB*x.Price,baV,baV+ownB*x.Price-firstA-firstBMoney,
 				x.Time.Format("2006-01-02 15:04:05"))
 		}
 		ownBaseAll:=0.0
@@ -566,18 +571,17 @@ func PrintAnalysisInfo(p *BinanceEx){
 		free:=balance.Free+balance.Frozen+ownBaseAll*p.curRecords.GetLastRecord().Close
 
 		showStr+=fmt.Sprintf("\n结束\n%s:账户总资产：%f--->%s账户总资产:%f   单位[%s]\n资产总收益:%f     累计手续费:%f",
-			p.startTime.Format("2006-01-02 15:04:05"),firstA,
+			p.startTime.Format("2006-01-02 15:04:05"),firstA+firstBMoney,
 			p.curRecords.GetLastRecord().Time.Format("2006-01-02 15:04:05"),free,p.CurTP.GetQuote(),
-			free-firstA,totalFee)
+			free-firstA-firstBMoney,totalFee)
 
-		huiPre:=(free-firstA)/firstA*100
+		huiPre:=(free-firstA-firstBMoney)/(firstA+firstBMoney)*100
 		//
-		firstBase:=firstA/p.account.trades[0].Price
+		firstBase:=firstA/startOptRecord.Close+firstB
 		endBase:=(balance.Free+balance.Frozen)/p.curRecords.GetLastRecord().Close+ownBaseAll
 
 		//
-		startOptTime:=getOptPreTime(p.CurTP.OptFrequency,p.startTime)
-		startOptRecord:=p.curRecords.getRecordByTime(startOptTime)
+
 		handerHui:=(p.curRecords.GetLastRecord().Close-startOptRecord.Close)/startOptRecord.Close*100
 		//
 		showStr+=fmt.Sprintf("\n投资回报率:%.2f%%   持币分析：[%f]->[%f]=%f 个%s[%.2f%%]   币价分析：[%f]->[%f]=%f %s[%.2f%%]",huiPre,
