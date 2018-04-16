@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strconv"
 	"math"
+	"os"
 )
 
 func getAverage(record *model.Record) float64  {
@@ -442,6 +443,9 @@ func PrintDebugInfo(p *BinanceDebugEx){
 
 
 	log.Info(showStr)
+	showStr=fmt.Sprintf("初始账户情况：%+v\n\n",p.initAssets)+showStr
+	filePath:=p.LogDir+p.CurTP.Name+"_"+GetOptFreTimeStr(p.CurTP.OptFrequency)+".report"
+	saveReportToFile(showStr,filePath)
 }
 
 func PrintAnalysisInfo(p *BinanceEx){
@@ -546,7 +550,7 @@ func PrintAnalysisInfo(p *BinanceEx){
 		}
 		showStr+="\n"
 		//
-		startOptTime:=getOptPreTime(p.CurTP.OptFrequency,p.startTime)
+		startOptTime:=getOptPreTime(p.CurTP.OptFrequency,p.StartTime)
 		startOptRecord:=p.curRecords.getRecordByTime(startOptTime)
 
 		firstA:=p.initAssets.Free+p.initAssets.Frozen
@@ -556,7 +560,7 @@ func PrintAnalysisInfo(p *BinanceEx){
 		var totalFee float64=0
 		balance:=p.account.getBalance(p.CurTP.GetQuote())
 		for _,x:=range p.account.trades{
-			ownB:=p.account.getOwnBaseByTime(x.Time)
+			ownB:=p.account.getOwnBaseByTime(x.Time)+firstB
 			baV:=p.account.getBalanceByTime(x.Time)+firstA
 			totalFee+=x.Commission
 			showStr+=fmt.Sprintf("%16d%7s%20g%20.16g%20g%20g%20.16g%20.10g%20.10g%22s\n",x.ID,x.Type,x.Amount,x.Price,
@@ -571,7 +575,7 @@ func PrintAnalysisInfo(p *BinanceEx){
 		free:=balance.Free+balance.Frozen+ownBaseAll*p.curRecords.GetLastRecord().Close
 
 		showStr+=fmt.Sprintf("\n结束\n%s:账户总资产：%f--->%s账户总资产:%f   单位[%s]\n资产总收益:%f     累计手续费:%f",
-			p.startTime.Format("2006-01-02 15:04:05"),firstA+firstBMoney,
+			p.StartTime.Format("2006-01-02 15:04:05"),firstA+firstBMoney,
 			p.curRecords.GetLastRecord().Time.Format("2006-01-02 15:04:05"),free,p.CurTP.GetQuote(),
 			free-firstA-firstBMoney,totalFee)
 
@@ -619,4 +623,25 @@ func PrintAnalysisInfo(p *BinanceEx){
 
 
 	log.Info(showStr)
+	showStr=fmt.Sprintf("初始账户情况：%+v %+v\n\n",p.initBase,p.initAssets)+showStr
+	filePath:=p.LogDir+p.CurTP.Name+"_"+GetOptFreTimeStr(p.CurTP.OptFrequency)+".report"
+	saveReportToFile(showStr,filePath)
+}
+func saveReportToFile(msg,fileName string){
+
+	f,err:= os.Create(fileName)
+
+	if err != nil {
+		log.Infof("保存报告文件失败:%s",fileName)
+		return
+	}
+	defer func() {
+		err=f.Close()
+	}()
+
+	log.Infof("生成简报O(∩_∩)O:%s",fileName)
+	//
+	f.WriteString(msg)
+	//
+
 }

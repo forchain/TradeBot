@@ -21,3 +21,4 @@ main.go
 tests/
 .idea/dictionaries/
 data/binance/kline_bnb.gob
+go_build_tradeMain_go

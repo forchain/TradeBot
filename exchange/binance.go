@@ -18,7 +18,7 @@ const SHOW_MAX_NUM=20
 type BinanceEx struct {
 	Exchange
 	client *binance.Client
-	startTime time.Time
+
 	lastPingTime time.Time
 	lastGetRTime time.Time
 	curRecords ExchangeRecords
@@ -36,10 +36,10 @@ type BinanceEx struct {
 	initExRate float64
 }
 func (p *BinanceEx) Init(){
-	p.startTime=time.Now()
+	p.StartTime=time.Now()
 	p.curOptIndex=0
 
-	log.Infof("操作频率：%s",getOptFreTimeStr(p.CurTP.OptFrequency))
+	log.Infof("操作频率：%s",GetOptFreTimeStr(p.CurTP.OptFrequency))
 	PING_SPACE=getOptFreTimeDur(p.CurTP.OptFrequency)
 
 	//BINANCE_APIKEY:= os.Getenv("BINANCE_APIKEY")
@@ -208,7 +208,7 @@ func (p *BinanceEx) getRecords(startTime,endTime time.Time) error {
 	}
 
 	records, err := p.client.GetRecords(ctx, p.CurTP.GetBase(), p.CurTP.GetQuote(),
-		getOptFreTimeStr(p.CurTP.OptFrequency), startT,endT,0)
+		GetOptFreTimeStr(p.CurTP.OptFrequency), startT,endT,0)
 	if err != nil {
 		return fmt.Errorf("Get %s records failed, err: %v",p.CurTP.Name,err)
 	}
@@ -440,7 +440,7 @@ func (p *BinanceEx)updateOrders() bool{
 	//过滤掉以前的
 	var realOrders []model.Order
 	for _,x:=range orders{
-		if x.Time.Equal(p.startTime)||x.Time.After(p.startTime){
+		if x.Time.Equal(p.StartTime)||x.Time.After(p.StartTime){
 			realOrders=append(realOrders,x)
 		}
 	}
@@ -504,7 +504,7 @@ func (p *BinanceEx)getMyTrades()  {
 	//过滤掉以前的
 	var realTrades []model.Trade
 	for _,x:=range trades{
-		if x.Time.Equal(p.startTime)||x.Time.After(p.startTime){
+		if x.Time.Equal(p.StartTime)||x.Time.After(p.StartTime){
 			realTrades=append(realTrades,x)
 		}
 	}

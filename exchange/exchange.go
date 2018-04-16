@@ -31,6 +31,8 @@ type Exchange struct {
 	Fee float64
 	APIKey string
 	APISecretKey string
+	LogDir string
+	StartTime time.Time
 	CurTP TradePairConfig
 	Tactics ITactics
 
@@ -185,7 +187,7 @@ func getOptPreTime(optFre int,t time.Time) time.Time {
 	}
 	return t
 }
-func getOptFreTimeStr(optFre int) string{
+func GetOptFreTimeStr(optFre int) string{
 	switch optFre {
 	case Min5:
 		return binance.Interval.String(binance.Interval5m)
@@ -223,7 +225,7 @@ func (p *TradePairConfig) GetQuote() string{
 
 func getDataFileName(exch IExchange) string {
 
-	return "data/"+exch.GetExchange().Name+"/"+getOptFreTimeStr(exch.GetExchange().CurTP.OptFrequency)+"/"+exch.GetExchange().CurTP.Name+".json"
+	return "data/"+exch.GetExchange().Name+"/"+GetOptFreTimeStr(exch.GetExchange().CurTP.OptFrequency)+"/"+exch.GetExchange().CurTP.Name+".json"
 }
 
 func LoadData(fileName string,records *ExchangeRecords) error {

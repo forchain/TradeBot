@@ -44,7 +44,7 @@ func (p *BinanceDebugEx) Init(){
 	defer cancel()*/
 	log.Debugln("欢迎进入调试模式：\n登录币安官网")
 	//
-	log.Infof("操作频率：%s",getOptFreTimeStr(p.CurTP.OptFrequency))
+	log.Infof("操作频率：%s",GetOptFreTimeStr(p.CurTP.OptFrequency))
 	//账户信息
 	p.initAssets=model.Balance{p.CurTP.GetQuote(),10000,0}
 	ba:=p.initAssets
@@ -413,7 +413,7 @@ func (p *BinanceDebugEx)updateMyOrders() {
 						}
 						//成功促成交易
 						trade:=model.Trade{x.ID,TradeType.String(TradeBuy),x.Price,
-						x.DealAmount,opt.time,cost,p.CurTP.GetQuote(),
+						x.DealAmount,opt.time,x.Amount*x.Price*p.Fee,p.CurTP.GetQuote(),
 						x.ID,""}
 						p.account.trades=append(p.account.trades, trade)
 						//

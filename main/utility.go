@@ -11,7 +11,7 @@ import (
 
 
 const FileName  = "data/config.json"
-var logFileName string=time.Now().Format("2006-01-02_15-04-05")+".log"
+var logFileName string="null"
 
 /*交易市场的配置*/
 type ExchangeConfig struct {
@@ -61,10 +61,12 @@ func Init() bool {
 		return false
 	}
 	//
-	openLogFile()
+
 	//配置交易策略模块
 
 	curExchange,err=getExchangeInstance()
+	openLogFile()
+
 	if err!=nil {
 		log.Errorln(err)
 		return false
@@ -199,7 +201,7 @@ func getExchangeInstance() (exchange.IExchange,error){
 	}
 
 	excha:=exchange.Exchange{ExchangeC.Name,ExchangeC.Fee,ExchangeC.APIKey,
-	ExchangeC.APISecretKey,ExchangeC.CurTP, tact}
+	ExchangeC.APISecretKey,ExchangeC.LogDir,time.Now(),ExchangeC.CurTP, tact}
 
 	var ie exchange.IExchange
 	if ExchangeC.IsDebug {
@@ -222,14 +224,15 @@ func openLogFile(){
 		return
 	}
 	var err error
-	lfName:=ExchangeC.LogDir+logFileName
-	logFile,err= os.Create(lfName)
+
+	logFileName=ExchangeC.LogDir+curExchange.GetExchange().CurTP.Name+"_"+exchange.GetOptFreTimeStr(curExchange.GetExchange().CurTP.OptFrequency)+"_"+curExchange.GetExchange().StartTime.Format("2006-01-02_15-04-05")+".log"
+	logFile,err= os.Create(logFileName)
 
 	if err != nil {
-		log.Infof("创建日志文件失败:%s",lfName)
+		log.Infof("创建日志文件失败:%s",logFileName)
 		return
 	}
-	log.Infof("创建日志文件:%s",lfName)
+	log.Infof("创建日志文件:%s",logFileName)
 }
 func closeLogFile(){
 	if logFile==nil {
@@ -238,8 +241,7 @@ func closeLogFile(){
 
 
 
-	lfName:=ExchangeC.LogDir+logFileName
 	//
-	log.Infof("保存日志文件:%s",lfName)
+	log.Infof("保存日志文件:%s",logFileName)
 	logFile=nil
 }
