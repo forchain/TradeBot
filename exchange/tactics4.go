@@ -3,7 +3,9 @@ package exchange
 import (
 	log "github.com/sirupsen/logrus"
 	"github.com/forchain/cryptotrader/binance"
+	"github.com/forchain/cryptotrader/model"
 )
+
 
 type Tactics4 struct {
 	tactData *TacticsData
@@ -174,19 +176,43 @@ func (p *Tactics4)stopLoss()bool{
 	if tLen<=0 {
 		return false
 	}
-	if p.tactData.account.trades[tLen-1].Type!=TradeType.String(TradeBuy) {
+	/*if p.tactData.account.trades[tLen-1].Type!=TradeType.String(TradeBuy) {
 		return false
-	}
+	}*/
 	rLen:=len(p.tactData.CurRecords.Records)
 	if  rLen<=0{
 		return false
 	}
-	if p.tactData.CurRecords.Records[rLen-1].Close*1.1<p.tactData.account.trades[tLen-1].Price{
+	var trade *model.Trade
 
-		optCmd:=OptRecord{optType:binance.OrderSell,reason:STOP_LOSS}
-		p.tactData.Excha.Execute(optCmd)
-
-		return true
+	for i:=tLen-1;i>=0 ;i--  {
+		if p.tactData.account.trades[i].Type==TradeType.String(TradeBuy)  {
+			trade=&p.tactData.account.trades[i]
+			break
+		}
 	}
+	if trade==nil {
+		return false
+	}
+	srcMACDs:=*p.tactData.CurMACDs
+	mLen:=len(srcMACDs)
+	if mLen<6 {
+		return false
+	}
+	if srcMACDs[mLen-1].MACD<0&&
+		srcMACDs[mLen-2].MACD<0&&
+		srcMACDs[mLen-1].MACD<srcMACDs[mLen-2].MACD{
+
+		if p.tactData.CurRecords.Records[rLen-1].Close<trade.Price{
+
+			optCmd:=OptRecord{optType:binance.OrderSell,reason:STOP_LOSS}
+			p.tactData.Excha.Execute(optCmd)
+
+			return true
+		}
+	}
+
+
+
 	return false
 }

@@ -289,9 +289,9 @@ func (p *BinanceEx)Execute(cmd OptRecord) {
 		//
 		//定价
 		curAPrice:=curRecord.Close
-		if  curRecord.Close>curRecord.Open{
+		/*if  curRecord.Close>curRecord.Open{
 			curAPrice=getAverage(lastRecord)
-		}
+		}*/
 		curAPrice=getPrecisionFloat(curAPrice,p.CurTP.MinTradePrice)
 		if curAPrice<=p.CurTP.MinTradePrice {
 			return
@@ -347,11 +347,11 @@ func (p *BinanceEx)Execute(cmd OptRecord) {
 		ownBase:=p.account.getBalance(p.CurTP.GetBase())
 		if ownBase!=nil {
 			//调试用-----
-			if p.CurTP.OptFrequency==Hour {
+			/*if p.CurTP.OptFrequency==Hour {
 				ownBaseFree=ownBase.Free-19.7
-			}else {
+			}else {*/
 				ownBaseFree=ownBase.Free
-			}
+			//}
 			//----------
 		}
 		income:=ownBaseFree-ownBaseFree*p.Fee
