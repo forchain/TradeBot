@@ -10,6 +10,8 @@ import (
 	"time"
 	"github.com/forchain/cryptotrader/binance"
 	log "github.com/sirupsen/logrus"
+	"fmt"
+	"strconv"
 )
 
 /*交易所*/
@@ -18,6 +20,8 @@ const (
 	OK="OK"
 	ZB="ZB"
 )
+/*数据文件中记录的最大条数*/
+const MaxRecordItemNum=500
 
 type IExchange interface {
 	Init()
@@ -35,7 +39,6 @@ type Exchange struct {
 	StartTime time.Time
 	CurTP TradePairConfig
 	Tactics ITactics
-
 }
 type ExchangeRecords struct {
 	Records []model.Record
@@ -105,6 +108,13 @@ func (p *ExchangeRecords)Sort(){
 	rs:=RecordsSort(p.Records)
 	sort.Sort(rs)
 }
+func (p *ExchangeRecords)Join(other *ExchangeRecords){
+
+	for _,v:=range other.Records{
+		p.Records=append(p.Records,v)
+	}
+}
+
 
 type RecordsSort []model.Record
 func (p RecordsSort) Len() int {
@@ -227,15 +237,82 @@ func getDataFileName(exch IExchange) string {
 
 	return "data/"+exch.GetExchange().Name+"/"+GetOptFreTimeStr(exch.GetExchange().CurTP.OptFrequency)+"/"+exch.GetExchange().CurTP.Name+".json"
 }
+func getDataFilePath(exch IExchange) string {
 
-func LoadData(fileName string,records *ExchangeRecords) error {
+	return "data/"+exch.GetExchange().Name+"/"+GetOptFreTimeStr(exch.GetExchange().CurTP.OptFrequency)
+}
+func getRecordsFileInfoSort(dir string,tpName string)RecordsFileInfoSort{
+	//获取最近的数据包
+	var rfis RecordsFileInfoSort
+	fileList:=GetDataFileList(dir,[]string{".json",tpName})
+	if len(fileList)<=0 {
+		return rfis
+	}
+
+	var err error
+	var rfi RecordsFileInfo
+
+	for _,v:=range fileList {
+		rfi = RecordsFileInfo{File: v}
+		err=rfi.Init()
+		if err==nil {
+			rfis=append(rfis,rfi)
+		}
+	}
+	sort.Sort(rfis)
+	return rfis
+}
+func LoadData(dir string,records *ExchangeRecords,tpName string,isDebug bool) error {
+	//获取最近的数据包
+	rfis:=getRecordsFileInfoSort(dir,tpName)
+	rLen:=len(rfis)
+	if rLen<=0 {
+		return fmt.Errorf("没有找到任何数据")
+	}
+	var err error
+	var fileName string
+	//
+
+	if rLen==1 {
+		fileName=dir+"/"+rfis[0].File.Name()
+	}else {
+		if isDebug {
+			var tempRecors ExchangeRecords
+
+			for _,r:=range rfis{
+				tempRecors=ExchangeRecords{}
+				fileName=dir+"/"+r.File.Name()
+				curE:=doLoadData(fileName,&tempRecors)
+				records.Join(&tempRecors)
+				if curE!=nil {
+					err=curE
+				}
+
+			}
+			return err
+		}else {
+			fileName=dir+"/"+rfis[rLen-1].File.Name()
+		}
+
+	}
+
+	if fileName=="" {
+		return fmt.Errorf("没有找到任何数据")
+	}
+	return doLoadData(fileName,records)
+
+
+	//
+
+}
+func doLoadData(fileName string,records *ExchangeRecords)error{
 	var f *os.File
 	var err error
 
 	if IsExist(fileName) {
 		f,err= os.Open(fileName)
 	} else {
-		return nil
+		err=fmt.Errorf("文件不存在")
 	}
 
 	if err != nil {
@@ -250,10 +327,74 @@ func LoadData(fileName string,records *ExchangeRecords) error {
 	}()
 	//
 	err=json.NewDecoder(f).Decode(records)
+	if err!=nil {
+		return err
+	}
+	log.Infof("读取数据文件：%s",fileName)
 	return nil
 }
-func SaveData(fileName string,records *ExchangeRecords) error {
 
+func SaveData(dir string,records *ExchangeRecords,tpName string) error {
+
+	//获取最近的数据包
+	rfis:=getRecordsFileInfoSort(dir,tpName)
+	sLen:=len(rfis)
+
+	var fileName string
+	var err error
+	rLen:=len(records.Records)
+	if rLen>MaxRecordItemNum {
+		var num int=rLen/MaxRecordItemNum+1
+		var index int=0
+		var tempRecords ExchangeRecords
+		var tLen int
+		for i:=0; i<num;i++  {
+			tempRecords.Records=[]model.Record{}
+			for j:=0;j<MaxRecordItemNum ;j++  {
+				index=i*MaxRecordItemNum+j
+				if index<rLen {
+					tempRecords.Records=append(tempRecords.Records,records.Records[index])
+				}else {
+					break
+				}
+			}
+			tLen=len(tempRecords.Records)
+			if tLen>0 {
+				if i>0{
+					time.Sleep(time.Second*2)
+					fileName=dir+"/"+tpName+"_"+strconv.FormatInt(time.Now().Unix(),10)+".json"
+				}else {
+					if sLen>0 {
+						fileName=dir+"/"+rfis[sLen-1].File.Name()
+					}else {
+						fileName=dir+"/"+tpName+"_"+strconv.FormatInt(time.Now().Unix(),10)+".json"
+					}
+				}
+
+				erre:=doSaveData(fileName,&tempRecords)
+				if err!=nil {
+					err=erre
+				}
+			}else {
+				break
+			}
+
+		}
+	}else {
+		if sLen>0 {
+			fileName=dir+"/"+rfis[sLen-1].File.Name()
+		}else {
+			fileName = dir + "/" + tpName + "_" + strconv.FormatInt(time.Now().Unix(), 10) + ".json"
+		}
+		return doSaveData(fileName,records)
+	}
+	return err
+}
+
+func doSaveData(fileName string,records *ExchangeRecords) error {
+
+
+	//
 	var f *os.File
 	var err error
 	f,err= os.Create(fileName)
@@ -268,11 +409,14 @@ func SaveData(fileName string,records *ExchangeRecords) error {
 			err=cErr
 		}
 	}()
+
+
 	//
 	encoder:=json.NewEncoder(f)
 	encoder.SetIndent("","    ")
 	err=encoder.Encode(records)
 	//f.Sync()
+	log.Infof("保存数据文件：%s",fileName)
 	return err
 }
 /**

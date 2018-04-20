@@ -7,10 +7,10 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/forchain/TradeBot/exchange"
 	"time"
+	"flag"
 )
 
 
-const FileName  = "data/config.json"
 var logFileName string="null"
 
 /*交易市场的配置*/
@@ -45,6 +45,11 @@ var curExchange exchange.IExchange
 
 
 func Init() bool {
+	//flag
+	configFileName:= flag.String("cfgFile", "data/config.json", "配置文件路径")
+
+	flag.Parse()
+
 	//
 	log.SetFormatter(new(LogFormatter))
 	log.SetOutput(os.Stdout)
@@ -53,9 +58,9 @@ func Init() bool {
 	//
 	log.Infoln("欢迎使用自动化交易系统^_^")
 	//
-
+	log.Infof("配置文件读取路径：%s",*configFileName)
 	//
-	err:=LoadConfig(FileName)
+	err:=LoadConfig(*configFileName)
 	if err!=nil {
 		log.Errorln(err)
 		return false

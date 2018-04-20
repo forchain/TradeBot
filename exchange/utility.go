@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"math"
 	"os"
+	"path/filepath"
 )
 
 func getAverage(record *model.Record) float64  {
@@ -99,6 +100,27 @@ func getPrecisionFloat(src,pre float64)float64{
 
 	return result
 }
+func GetDataFileList(path string,match []string)[]os.FileInfo {
+	var result []os.FileInfo
+	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+		if ( f == nil ) {return err}
+		if !f.IsDir()&&len(f.Name())>0{
+			for _,v:=range match{
+				if !strings.Contains(f.Name(), v)  {
+					return nil
+				}
+			}
+			result=append(result,f)
+		}
+		return nil
+	})
+	if err != nil {
+		return []os.FileInfo{}
+	}
+	return result
+}
+
+//-----------------------------------------------------------
 func PrintGetRecordsInfo(records []model.Record,modify []int){
 
 	modifyLen:=len(modify)

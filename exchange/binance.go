@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/markcheno/go-talib"
 	"github.com/forchain/cryptotrader/model"
+	"os"
 )
 
 var PING_SPACE time.Duration
@@ -42,20 +43,27 @@ func (p *BinanceEx) Init(){
 	log.Infof("操作频率：%s",GetOptFreTimeStr(p.CurTP.OptFrequency))
 	PING_SPACE=getOptFreTimeDur(p.CurTP.OptFrequency)
 
-	//BINANCE_APIKEY:= os.Getenv("BINANCE_APIKEY")
-	//BINANCE_SECRETKEY:=os.Getenv("BINANCE_SECRETKEY")
-	if len(p.APIKey)<=0||len(p.APISecretKey)<=0 {
-		log.Errorf("API无账户配置")
-		return
+
+	var BINANCE_APIKEY string
+	var	BINANCE_SECRETKEY string
+
+	if p.APIKey==""||p.APISecretKey==""{
+		log.Errorf("config API无账户配置,读取系统环境配置")
+
+		BINANCE_APIKEY= os.Getenv("BINANCE_APIKEY")
+		BINANCE_SECRETKEY=os.Getenv("BINANCE_SECRETKEY")
+	}else{
+		BINANCE_APIKEY=p.APIKey
+		BINANCE_SECRETKEY=p.APISecretKey
 	}
-	p.client= binance.New(p.APIKey, p.APISecretKey)
-	log.Infof("key:%s  secret:%s",p.APIKey,p.APISecretKey)
+	p.client= binance.New(BINANCE_APIKEY,BINANCE_SECRETKEY)
+	//log.Infof("key:%s  secret:%s",p.APIKey,p.APISecretKey)
 
 
 	//
 	//加载本地的数据
 
-	LoadData(getDataFileName(p),&p.curRecords)
+	LoadData(getDataFilePath(p),&p.curRecords,p.CurTP.Name,false)
 
 	PrintLocalRecordsInfo(p.curRecords.Records,SHOW_MAX_NUM)
 
@@ -229,7 +237,7 @@ func (p *BinanceEx) getRecords(startTime,endTime time.Time) error {
 	if len(modify)>0 {
 		p.curRecords.Sort()
 		//本地同步最新数据
-		fErr:=SaveData(getDataFileName(p),&p.curRecords)
+		fErr:=SaveData(getDataFilePath(p),&p.curRecords,p.CurTP.Name)
 		if fErr!=nil {
 			log.Errorf("保存文件失败：%+v",fErr)
 		}

@@ -1,0 +1,4 @@
+
+命令行启动：
+ 如果不指定cfgFile 默认是读取data/config.json
+./programName -cfgFile=youConfigFilePath

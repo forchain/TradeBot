@@ -37,11 +37,6 @@ func (p *BinanceDebugEx) Init(){
 	p.startTime=time.Now()
 	p.curOptIndex=0
 	p.curElapsed=time.Now()
-	/*p.client= binance.New("CDtAD8asuxS4XVMmgRGi5nzkaSkvd5oZVdtMFdj9KneB40OzsTPGRX95s6i6TSIF",
-		"aE0T4gKXmfld8qseFxOaPxXBgM8s44W5futDPyOyp7T9DmYvNo1KGOePCVVNo0Qn")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()*/
 	log.Debugln("欢迎进入调试模式：\n登录币安官网")
 	//
 	log.Infof("操作频率：%s",GetOptFreTimeStr(p.CurTP.OptFrequency))
@@ -55,7 +50,7 @@ func (p *BinanceDebugEx) Init(){
 	//
 	//加载本地的数据
 
-	LoadData(getDataFileName(p),&p.serverRecords)
+	LoadData(getDataFilePath(p),&p.serverRecords,p.CurTP.Name,true)
 	//p.serverRecords.Records=helpers.ReverseExchangeData(p.serverRecords.Records)
 	//模拟一个服务器时间
 	p.serverTime=time.Now()
@@ -375,6 +370,7 @@ func (p *BinanceDebugEx)onEndDebug(){
 	PrintMACDsInfo(p.curMACDs,p.curRecords.Records,SHOW_MAX_NUM*2)
 
 	log.Println("所有的记录已经测试完")
+	SaveData(getDataFilePath(p),&p.curRecords,p.CurTP.Name)
 	//
 	PrintDebugInfo(p)
 

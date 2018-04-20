@@ -3,12 +3,12 @@
     "Fee": 0.001,
     "APIKey": "",
     "APISecretKey": "",
-    "Tactics": 4,
+    "Tactics": 3,
     "LogDir": "data/",
     "IsDebug": true,
     "CurTP": {
         "Name": "ETH-USDT",
-        "OptFrequency": 0,
+        "OptFrequency": 2,
         "MinTradeNum": 0.00001,
         "MinOrderTotalPrice": 10,
         "MinTradePrice": 0.01
