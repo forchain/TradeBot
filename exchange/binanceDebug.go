@@ -29,6 +29,7 @@ type BinanceDebugEx struct {
 	curElapsed time.Time
 
 	initAssets model.Balance
+	initBase model.Balance
 
 
 	curOptIndex int64
@@ -40,10 +41,13 @@ func (p *BinanceDebugEx) Init(){
 	log.Debugln("欢迎进入调试模式：\n登录币安官网")
 	//
 	log.Infof("操作频率：%s",GetOptFreTimeStr(p.CurTP.OptFrequency))
+	log.Infof("止损：%f%%  止盈：%f%%",p.StopLoss*100,p.StopGain*100)
 	//账户信息
 	p.initAssets=model.Balance{p.CurTP.GetQuote(),10000,0}
+	p.initBase=model.Balance{p.CurTP.GetBase(),0,0}
 	ba:=p.initAssets
 	p.account.balances=append(p.account.balances,ba)
+	p.account.balances=append(p.account.balances,p.initBase)
 	log.Infof("账户情况: %+v",p.account)
 
 
@@ -315,8 +319,8 @@ func (p *BinanceDebugEx)Execute(cmd OptRecord) {
 		if curAPrice<=p.CurTP.MinTradePrice {
 			return
 		}
-		//balance:=p.account.getBalance(p.CurTP.GetQuote())
-		ownBase:=p.account.getOwnBase()
+		balance:=p.account.getBalance(p.CurTP.GetBase())
+		ownBase:=balance.Free//p.account.getOwnBase()
 		openOrders:=p.account.getOpenOrders()
 
 		if len(openOrders)>0 {
@@ -370,7 +374,7 @@ func (p *BinanceDebugEx)onEndDebug(){
 	PrintMACDsInfo(p.curMACDs,p.curRecords.Records,SHOW_MAX_NUM*2)
 
 	log.Println("所有的记录已经测试完")
-	SaveData(getDataFilePath(p),&p.curRecords,p.CurTP.Name)
+	//SaveData(getDataFilePath(p),&p.curRecords,p.CurTP.Name)
 	//
 	PrintDebugInfo(p)
 
@@ -379,6 +383,8 @@ func (p *BinanceDebugEx)onEndDebug(){
 func (p *BinanceDebugEx)updateMyOrders() {
 	//调试处理订单
 	balance:=p.account.getBalance(p.CurTP.GetQuote())
+	bbalance:=p.account.getBalance(p.CurTP.GetBase())
+
 	lastRecord:=p.getLastRecord()
 	if balance==nil||lastRecord==nil {
 		log.Errorf("订单处理失败")
@@ -407,6 +413,8 @@ func (p *BinanceDebugEx)updateMyOrders() {
 						if balance.Frozen<0 {
 							balance.Frozen=0
 						}
+						bbalance.Free+=x.Amount
+
 						//成功促成交易
 						trade:=model.Trade{x.ID,TradeType.String(TradeBuy),x.Price,
 						x.DealAmount,opt.time,x.Amount*x.Price*p.Fee,p.CurTP.GetQuote(),
@@ -421,6 +429,7 @@ func (p *BinanceDebugEx)updateMyOrders() {
 					}else {
 						income:=x.Amount*x.Price*(1-p.Fee)
 						balance.Free+=income
+						bbalance.Free-=x.Amount
 
 						trade:=model.Trade{x.ID,TradeType.String(TradeSell),x.Price,
 							x.DealAmount,opt.time,x.Amount*x.Price*p.Fee,

@@ -39,6 +39,8 @@ type Exchange struct {
 	StartTime time.Time
 	CurTP TradePairConfig
 	Tactics ITactics
+	StopLoss float64
+	StopGain float64
 }
 type ExchangeRecords struct {
 	Records []model.Record
@@ -92,6 +94,18 @@ func (p *ExchangeRecords)getRecordByTime(time time.Time) *model.Record{
 		}
 	}
 	return nil
+}
+func (p *ExchangeRecords)getRecordIndexByTime(time time.Time) int{
+	rLen:=len(p.Records)
+	if rLen<=0 {
+		return -1
+	}
+	for i,x:=range p.Records{
+		if x.Time.Equal(time) {
+			return i
+		}
+	}
+	return -1
 }
 func (p *ExchangeRecords)getRecordBeforeTime(time time.Time) []model.Record{
 

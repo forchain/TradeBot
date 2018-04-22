@@ -202,8 +202,8 @@ func (p *Tactics4)stopLoss()bool{
 	if srcMACDs[mLen-1].MACD<0&&
 		srcMACDs[mLen-2].MACD<0&&
 		srcMACDs[mLen-1].MACD<srcMACDs[mLen-2].MACD{
-
-		if p.tactData.CurRecords.Records[rLen-1].Close<trade.Price{
+		stopLoss:=(1-p.tactData.Excha.GetExchange().StopLoss)*trade.Price
+		if p.tactData.CurRecords.Records[rLen-1].Close<stopLoss{
 
 			optCmd:=OptRecord{optType:binance.OrderSell,reason:STOP_LOSS}
 			p.tactData.Excha.Execute(optCmd)

@@ -18,6 +18,9 @@ import (
 func getAverage(record *model.Record) float64  {
 	return (record.Open+record.Close+record.High+record.Low)/4.0
 }
+func getGeometryAverage(record *model.Record) float64  {
+	return math.Pow(record.Open*record.Close*record.High*record.Low,1.0/4.0)
+}
 func getHourTime(t time.Time) time.Time{
 	return time.Date(t.Year(),t.Month(),t.Day(), t.Hour(),0,0,0,time.Local)
 }

@@ -43,6 +43,7 @@ func (p *BinanceEx) Init(){
 	log.Infof("操作频率：%s",GetOptFreTimeStr(p.CurTP.OptFrequency))
 	PING_SPACE=getOptFreTimeDur(p.CurTP.OptFrequency)
 
+	log.Infof("止损：%f%%  止盈：%f%%",p.StopLoss*100,p.StopGain*100)
 
 	var BINANCE_APIKEY string
 	var	BINANCE_SECRETKEY string

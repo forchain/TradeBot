@@ -55,4 +55,4 @@ const (
 	STOP_LOSS
 )
 
-var reasonStr=[]string{"DIF线上穿MACD 0轴","DIF线下穿MACD 0轴","顶背离","底背离","黄金金叉","黄金死叉","当前价已经低于买入价"}
+var reasonStr=[]string{"DIF线上穿MACD 0轴","DIF线下穿MACD 0轴","顶背离","底背离","黄金金叉","黄金死叉","当前价已经低于止损价"}

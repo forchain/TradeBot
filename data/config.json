@@ -6,6 +6,8 @@
     "Tactics": 3,
     "LogDir": "data/",
     "IsDebug": true,
+    "StopLess": 1.0,
+    "StopGain": 0.5,
     "CurTP": {
         "Name": "ETH-USDT",
         "OptFrequency": 2,

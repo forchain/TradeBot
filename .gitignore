@@ -22,3 +22,7 @@ tests/
 .idea/dictionaries/
 data/binance/kline_bnb.gob
 go_build_tradeMain_go
+.DS_Store
+.DS_Store
+data/.DS_Store
+data/Binance/.DS_Store

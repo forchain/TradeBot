@@ -22,6 +22,8 @@ type ExchangeConfig struct {
 	Tactics int
 	LogDir string
 	IsDebug bool
+	StopLoss float64
+	StopGain float64
 	CurTP exchange.TradePairConfig
 }
 
@@ -203,10 +205,13 @@ func getExchangeInstance() (exchange.IExchange,error){
 		tact=&exchange.Tactics4{}
 	case 5:
 		tact=&exchange.Tactics5{}
+	case 6:
+		tact=&exchange.Tactics6{}
 	}
 
 	excha:=exchange.Exchange{ExchangeC.Name,ExchangeC.Fee,ExchangeC.APIKey,
-	ExchangeC.APISecretKey,ExchangeC.LogDir,time.Now(),ExchangeC.CurTP, tact}
+	ExchangeC.APISecretKey,ExchangeC.LogDir,time.Now(),
+	ExchangeC.CurTP, tact,ExchangeC.StopLoss,ExchangeC.StopGain}
 
 	var ie exchange.IExchange
 	if ExchangeC.IsDebug {
