@@ -365,7 +365,7 @@ func (p *BinanceDebugEx)Execute(cmd OptRecord) {
 }
 func (p *BinanceDebugEx)getLastRecord() *model.Record{
 	curOptT:=p.serverTime.Add(-getOptFreTimeDur(p.CurTP.OptFrequency))
-	curOptTime:=getHourTime(curOptT)
+	curOptTime:=getOptPreTime(p.CurTP.OptFrequency,curOptT)
 	//
 	return p.curRecords.getRecordByTime(curOptTime)
 }
