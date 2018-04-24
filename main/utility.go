@@ -207,6 +207,10 @@ func getExchangeInstance() (exchange.IExchange,error){
 		tact=&exchange.Tactics5{}
 	case 6:
 		tact=&exchange.Tactics6{}
+	case 7:
+		tact=&exchange.Tactics7{}
+	case 8:
+		tact=&exchange.Tactics8{}
 	}
 
 	excha:=exchange.Exchange{ExchangeC.Name,ExchangeC.Fee,ExchangeC.APIKey,

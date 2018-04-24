@@ -27,6 +27,7 @@ type OptRecord struct {
 	time time.Time
 	orderID int64
 	indexOpt int64
+	price float64
 }
 
 var (
@@ -53,6 +54,7 @@ const (
 	GOLDEN_CROSS
 	DEAD_CROSS
 	STOP_LOSS
+	STOP_GAIN
 )
 
-var reasonStr=[]string{"DIF线上穿MACD 0轴","DIF线下穿MACD 0轴","顶背离","底背离","黄金金叉","黄金死叉","当前价已经低于止损价"}
+var reasonStr=[]string{"DIF线上穿MACD 0轴","DIF线下穿MACD 0轴","顶背离","底背离","黄金金叉","黄金死叉","当前价已经低于止损价","接回仓位"}

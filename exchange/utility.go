@@ -442,8 +442,17 @@ func PrintDebugInfo(p *BinanceDebugEx){
 				p.CurTP.GetQuote(),handerHui)
 
 		//
+		var totalOptTrade int=1
+		for i:=0;i<tLen ;i++  {
 
-		showStr+=fmt.Sprintf("\n与一直持有情况下比，投资回报率:%.2f%%",huiPre-handerHui)
+			if i>0&&p.account.trades[i].Type!=p.account.trades[i-1].Type  {
+				totalOptTrade++
+			}
+		}
+		optTradeFrequency:=float64(totalOptTrade)/(float64(p.curRecords.GetLastRecord().Time.Sub(p.curRecords.GetFirstRecord().Time))/float64(getOptFreTimeDur(p.CurTP.OptFrequency)))
+		//
+
+		showStr+=fmt.Sprintf("\n与一直持有情况下比，投资回报率:%.2f%%     总有效操作数：%d   周期操作频率：%5.2f/%s",huiPre-handerHui,totalOptTrade,optTradeFrequency,GetOptFreTimeStr(p.CurTP.OptFrequency))
 
 		//
 		if huiPre<0 {
@@ -591,6 +600,7 @@ func PrintAnalysisInfo(p *BinanceEx){
 			showStr+=fmt.Sprintf("%16d%7s%20g%20.16g%20g%20g%20.16g%20.10g%20.10g%22s\n",x.ID,x.Type,x.Amount,x.Price,
 				x.Commission,ownB,ownB*x.Price,baV,baV+ownB*x.Price-firstA-firstBMoney,
 				x.Time.Format("2006-01-02 15:04:05"))
+
 		}
 		ownBaseAll:=0.0
 		baseBa:=p.account.getBalance(p.CurTP.GetBase())
@@ -619,9 +629,16 @@ func PrintAnalysisInfo(p *BinanceEx){
 			p.curRecords.GetLastRecord().Close-startOptRecord.Close,
 			p.CurTP.GetQuote(),handerHui)
 		//
+		var totalOptTrade int=1
+		for i:=0;i<tLen ;i++  {
 
-
-		showStr+=fmt.Sprintf("\n与一直持有情况下比，投资回报率:%.2f%%",huiPre-handerHui)
+			if i>0&&p.account.trades[i].Type!=p.account.trades[i-1].Type  {
+				totalOptTrade++
+			}
+		}
+		optTradeFrequency:=float64(totalOptTrade)/(float64(p.curRecords.GetLastRecord().Time.Sub(p.StartTime))/float64(getOptFreTimeDur(p.CurTP.OptFrequency)))
+		//
+		showStr+=fmt.Sprintf("\n与一直持有情况下比，投资回报率:%.2f%%     总有效操作数：%d   周期操作频率：%5.2f/%s",huiPre-handerHui,totalOptTrade,optTradeFrequency,GetOptFreTimeStr(p.CurTP.OptFrequency))
 		//
 		exRate:=getUSDToCNY()
 		showStr+=fmt.Sprintf("\n当前人民币汇率：$1 美元=￥%f 人民币   开始汇率[%f]  升值[￥%f]  总共[￥%f]\n",

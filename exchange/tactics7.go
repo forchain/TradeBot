@@ -8,20 +8,20 @@ import (
 )
 
 
-type Tactics6 struct {
+type Tactics7 struct {
 	tactData *TacticsData
 }
-func (p *Tactics6)Init(date *TacticsData){
+func (p *Tactics7)Init(date *TacticsData){
 	p.tactData=date
 	//
 	log.Infof("\n*********您正使用 第%d号 策略******",p.GetID())
 	//p.Update()
 
 }
-func (p *Tactics6)GetID() int{
-	return 6
+func (p *Tactics7)GetID() int{
+	return 7
 }
-func (p *Tactics6)Update(){
+func (p *Tactics7)Update(){
 	if p.tactData==nil {
 		return
 	}
@@ -39,7 +39,7 @@ func (p *Tactics6)Update(){
 
 }
 /*DIF突破0轴*/
-func (p *Tactics6) crossOver0ByDIF() bool{
+func (p *Tactics7) crossOver0ByDIF() bool{
 	mLen:=len(*p.tactData.CurMACDs)
 	if mLen<=0 {
 		log.Infoln("没有可用的MACD数据")
@@ -67,7 +67,7 @@ func (p *Tactics6) crossOver0ByDIF() bool{
 	}*/
 	return false
 }
-func (p *Tactics6)crossOverDEAByDIF() bool{
+func (p *Tactics7)crossOverDEAByDIF() bool{
 	mLen:=len(*p.tactData.CurMACDs)
 	if mLen<6 {
 		//log.Infoln("没有可用的MACD数据")
@@ -108,7 +108,7 @@ func (p *Tactics6)crossOverDEAByDIF() bool{
 	}
 	return false
 }
-func (p *Tactics6)getLastTrendStartIndex()int{
+func (p *Tactics7)getLastTrendStartIndex()int{
 	result:=-1
 
 	srcMACDs:=*p.tactData.CurMACDs
@@ -117,10 +117,25 @@ func (p *Tactics6)getLastTrendStartIndex()int{
 		return result
 	}
 
-	meetUnTrend:=false
+	meetUnTrend:=0
+	//meetUnTrend:=false
 	for i:=mLen-3;i>=0 ;i--  {
 
-		if meetUnTrend {
+		if meetUnTrend==0 {
+			if srcMACDs[mLen-2].MACD*srcMACDs[i].MACD<0 {
+				meetUnTrend=1
+			}
+		}else if meetUnTrend==1 {
+			if srcMACDs[mLen-2].MACD*srcMACDs[i].MACD>0 {
+				meetUnTrend=2
+			}
+		}else if meetUnTrend==2 {
+			if srcMACDs[mLen-2].MACD*srcMACDs[i].MACD<0 {
+				result=i
+				break
+			}
+		}
+		/*if meetUnTrend {
 			if srcMACDs[mLen-2].MACD*srcMACDs[i].MACD>0 {
 				result=i
 				break
@@ -129,11 +144,11 @@ func (p *Tactics6)getLastTrendStartIndex()int{
 			if srcMACDs[mLen-2].MACD*srcMACDs[i].MACD<0 {
 				meetUnTrend=true
 			}
-		}
+		}*/
 	}
 	return result
 }
-func (p *Tactics6)getLastHightAndLowIndex(lastIndex int)(float64,float64,error) {
+func (p *Tactics7)getLastHightAndLowIndex(lastIndex int)(float64,float64,error) {
 	rLen:=len(p.tactData.CurRecords.Records)
 	if  rLen<=0||lastIndex<0||lastIndex>=rLen{
 		return 0,0,fmt.Errorf("error:len")
@@ -153,7 +168,7 @@ func (p *Tactics6)getLastHightAndLowIndex(lastIndex int)(float64,float64,error) 
 	return highAverage,lowAverage,nil
 }
 
-func (p *Tactics6)stopLoss()bool{
+func (p *Tactics7)stopLoss()bool{
 	//
 	ownBaseFree:=0.0
 	ownBase:=p.tactData.account.getBalance(p.tactData.Excha.GetExchange().CurTP.GetBase())
@@ -184,13 +199,15 @@ func (p *Tactics6)stopLoss()bool{
 			}
 		}
 	}
+
+	if trade==nil {
+		return false
+	}
 	var tradeOptIndex int=-1
-	if trade!=nil {
-
-		optTime:=getOptPreTime(p.tactData.Excha.GetExchange().CurTP.OptFrequency,trade.Time)
-
-		//
-		tradeOptIndex=p.tactData.CurRecords.getRecordIndexByTime(optTime)
+	optTime:=getOptPreTime(p.tactData.Excha.GetExchange().CurTP.OptFrequency,trade.Time)
+	tradeOptIndex=p.tactData.CurRecords.getRecordIndexByTime(optTime)
+	if tradeOptIndex==-1||tradeOptIndex+4>=rLen {
+		return false
 	}
 	//
 	isFall:=false
@@ -213,35 +230,17 @@ func (p *Tactics6)stopLoss()bool{
 		highAverage,lowAverage=lowAverage,highAverage
 	}
 	optPrice:=0.0
-	if  tradeOptIndex==-1{
-		optPrice=(highAverage-lowAverage)*(1-p.tactData.Excha.GetExchange().StopLoss)+lowAverage
-	}else {
 
-		//tradeRecord:=p.tactData.CurRecords.Records[tradeOptIndex]
-		tradeMACD:=srcMACDs[tradeOptIndex]
-		if  tradeOptIndex>lastTSIndex{
-			if tradeMACD.MACD*srcMACDs[mLen-1].MACD>=0 {
-				optPrice=(highAverage-lowAverage)*(1-p.tactData.Excha.GetExchange().StopGain)+lowAverage
-			}else{
-				if trade.Price>lowAverage {
-					lowAverage=trade.Price
-				}
-				if trade.Price>highAverage {
-					highAverage=trade.Price
-				}
-				optPrice=(highAverage-lowAverage)*(1-p.tactData.Excha.GetExchange().StopGain)+lowAverage
-			}
-		}else {
-			if trade.Price>lowAverage {
-				lowAverage=trade.Price
-			}
-			if trade.Price>highAverage {
-				highAverage=trade.Price
-			}
-			optPrice=(highAverage-lowAverage)*(1-p.tactData.Excha.GetExchange().StopGain)+lowAverage
-		}
-
+	//tradeRecord:=p.tactData.CurRecords.Records[tradeOptIndex]
+	//tradeMACD:=srcMACDs[tradeOptIndex]
+	if trade.Price>lowAverage {
+		lowAverage=trade.Price
 	}
+	if trade.Price>highAverage {
+		highAverage=trade.Price
+	}
+	optPrice=(highAverage-lowAverage)*p.tactData.Excha.GetExchange().StopGain+trade.Price
+
 	if p.tactData.CurRecords.Records[rLen-1].Close<=optPrice {
 		optCmd:=OptRecord{optType:binance.OrderSell,reason:STOP_LOSS}
 		p.tactData.Excha.Execute(optCmd)
@@ -251,7 +250,7 @@ func (p *Tactics6)stopLoss()bool{
 	return false
 }
 /*MACD的降噪处理*/
-func (p *Tactics6) denoiseMACD(){
+func (p *Tactics7) denoiseMACD(){
 	//copy
 	mLen:=len(*p.tactData.CurMACDs)
 	if mLen<=5 {
