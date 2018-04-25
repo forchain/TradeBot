@@ -246,8 +246,8 @@ func (p *BinanceDebugEx)refreshMACD(){
 func (p *BinanceDebugEx)Execute(cmd OptRecord) {
 
 	curRecord:=p.curRecords.GetLastRecord()
-	lastRecord:=p.getLastRecord()
-	if curRecord==nil||lastRecord==nil {
+	//lastRecord:=p.getLastRecord()
+	if curRecord==nil/*||lastRecord==nil */{
 		log.Errorf("下单失败：找不到数据")
 		return
 	}
@@ -258,7 +258,7 @@ func (p *BinanceDebugEx)Execute(cmd OptRecord) {
 		curAPrice=cmd.price
 		log.Infof("使用自定义价格：%f   当前市价：%f",curAPrice,curRecord.Close)
 	}else {
-		curAPrice=curRecord.Close
+		curAPrice=curRecord.Open
 	}
 
 	switch cmd.optType {
