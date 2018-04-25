@@ -303,7 +303,8 @@ func LoadData(dir string,records *ExchangeRecords,tpName string,isDebug bool) er
 				if DebugStartTime!=nil {
 					rtempRecors=ExchangeRecords{}
 					for _,tr:=range tempRecors.Records{
-						if tr.Time.After(*DebugStartTime) {
+						if (tr.Time.After(*DebugStartTime)||tr.Time.Equal(*DebugStartTime))&&
+							(tr.Time.Before(*DebugEndTime)||tr.Time.Equal(*DebugEndTime)){
 							rtempRecors.Records=append(rtempRecors.Records,tr)
 						}
 					}

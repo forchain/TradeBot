@@ -50,6 +50,7 @@ func Init() bool {
 	//flag
 	configFileName:= flag.String("cfgFile", "data/config.json", "配置文件路径")
     debugStartTime:= flag.String("debugSTime", "", "")
+	debugEndTime:= flag.String("debugETime", "", "")
 	flag.Parse()
 
 	//
@@ -74,11 +75,19 @@ func Init() bool {
 
 			exchange.DebugStartTime=&theTime
 
-			log.Infof("设置调试时间成功：%v",theTime)
+			log.Infof("设置开始调试时间成功：%v",theTime)
 		}else {
-			log.Infof("设置调试时间失败，将调试所有记录")
+			log.Infof("设置开始调试时间失败，将从最开始记录调试")
 		}
+		theTime2,err2 := time.ParseInLocation("2006-01-02-15:04:05", *debugEndTime,time.Local)
+		if err2 == nil {
 
+			exchange.DebugEndTime=&theTime2
+
+			log.Infof("设置结束调试时间成功：%v",theTime2)
+		}else {
+			log.Infof("设置结束调试时间失败，将调试所有记录")
+		}
 	}
 	//配置交易策略模块
 

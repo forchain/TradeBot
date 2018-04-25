@@ -2,3 +2,7 @@
 命令行启动：
  如果不指定cfgFile 默认是读取data/config.json
 ./programName -cfgFile=youConfigFilePath
+
+
+调试模式下，可以指定需要调试的时间段
+./programName --debugSTime=2018-04-16-18:00:00 --debugETime=2018-04-17-18:00:00

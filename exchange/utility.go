@@ -692,3 +692,4 @@ func saveReportToFile(msg,fileName string){
 }
 /*调试开始的时间点*/
 var DebugStartTime *time.Time
+var DebugEndTime *time.Time
