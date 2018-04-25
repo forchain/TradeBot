@@ -292,12 +292,28 @@ func LoadData(dir string,records *ExchangeRecords,tpName string,isDebug bool) er
 	}else {
 		if isDebug {
 			var tempRecors ExchangeRecords
+			var rtempRecors ExchangeRecords
 
 			for _,r:=range rfis{
 				tempRecors=ExchangeRecords{}
 				fileName=dir+"/"+r.File.Name()
 				curE:=doLoadData(fileName,&tempRecors)
-				records.Join(&tempRecors)
+
+				//过滤
+				if DebugStartTime!=nil {
+					rtempRecors=ExchangeRecords{}
+					for _,tr:=range tempRecors.Records{
+						if tr.Time.After(*DebugStartTime) {
+							rtempRecors.Records=append(rtempRecors.Records,tr)
+						}
+					}
+					tempRecors=rtempRecors
+				}
+				//
+				if len(tempRecors.Records)>0 {
+					records.Join(&tempRecors)
+				}
+
 				if curE!=nil {
 					err=curE
 				}

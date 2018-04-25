@@ -236,7 +236,10 @@ func PrintLocalRecordsInfo(records []model.Record,showNum int){
 }
 
 func PrintMACDsInfo(macds MACDDatas,records []model.Record,showNum int){
-
+	mLen:=len(macds)
+	if mLen<=0 {
+		return
+	}
 	rLen:=len(records)
 	if rLen<=0{
 		log.Infof("\n没有任何MACD数据")
@@ -687,3 +690,5 @@ func saveReportToFile(msg,fileName string){
 	//
 
 }
+/*调试开始的时间点*/
+var DebugStartTime *time.Time

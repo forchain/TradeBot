@@ -49,7 +49,7 @@ var curExchange exchange.IExchange
 func Init() bool {
 	//flag
 	configFileName:= flag.String("cfgFile", "data/config.json", "配置文件路径")
-
+    debugStartTime:= flag.String("debugSTime", "", "")
 	flag.Parse()
 
 	//
@@ -68,7 +68,18 @@ func Init() bool {
 		return false
 	}
 	//
+	if ExchangeC.IsDebug&&(*debugStartTime)!="" {
+		theTime,err := time.ParseInLocation("2006-01-02-15:04:05", *debugStartTime,time.Local)
+		if err == nil {
 
+			exchange.DebugStartTime=&theTime
+
+			log.Infof("设置调试时间成功：%v",theTime)
+		}else {
+			log.Infof("设置调试时间失败，将调试所有记录")
+		}
+
+	}
 	//配置交易策略模块
 
 	curExchange,err=getExchangeInstance()

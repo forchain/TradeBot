@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-const CAP_FEE float64=2.0
+const CAP_FEE float64=5.0
 
 type Tactics8 struct {
 	tactData *TacticsData
