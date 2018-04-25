@@ -427,9 +427,9 @@ func (p *BinanceDebugEx)updateMyOrders() {
 
 
 					}else {
-						income:=x.Amount*x.Price*(1-p.Fee)
+						income:=x.Amount*x.Price
 						balance.Free+=income
-						bbalance.Free-=x.Amount
+						bbalance.Free-=(x.Amount+x.Amount*p.Fee)
 
 						trade:=model.Trade{x.ID,TradeType.String(TradeSell),x.Price,
 							x.DealAmount,opt.time,x.Amount*x.Price*p.Fee,
@@ -477,7 +477,7 @@ func (p *BinanceDebugEx)cancelOrder(order *model.Order,isFail bool)  {
 	if order.Side==binance.OrderSide.String(binance.OrderBuy) {
 			//
 			balance.Frozen-=cost
-			balance.Free+=order.Amount*order.Price
+			balance.Free+=cost
 			//
 
 			//

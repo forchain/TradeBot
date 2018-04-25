@@ -221,14 +221,17 @@ func (p *Tactics8) processBuy()bool{
 		return false
 	}
 	//
-
-	/*if  srcMACDs[mLen-2].MACD<srcMACDs[mLen-3].MACD&&
-		srcMACDs[mLen-3].MACD<srcMACDs[mLen-4].MACD{
+	isFall:=false
+	if  srcMACDs[mLen-2].MACD>srcMACDs[mLen-3].MACD&&
+		srcMACDs[mLen-3].MACD>srcMACDs[mLen-4].MACD{
 		isFall=true
-	}*/
-	if  srcMACDs[mLen-2].MACD<srcMACDs[mLen-3].MACD{
+	}
+	if !isFall {
 		return false
 	}
+	/*if  srcMACDs[mLen-2].MACD<srcMACDs[mLen-3].MACD{
+		return false
+	}*/
 	lastTSIndex:=p.getLastTrendStartIndex()
 	if lastTSIndex<0 {
 		return false
@@ -323,17 +326,17 @@ func (p *Tactics8) processSell()bool{
 		return false
 	}
 	//
-	/*isFall:=false
+	isFall:=false
 	if  srcMACDs[mLen-2].MACD<srcMACDs[mLen-3].MACD&&
 		srcMACDs[mLen-3].MACD<srcMACDs[mLen-4].MACD{
 		isFall=true
 	}
 	if !isFall {
 		return false
-	}*/
-	if  srcMACDs[mLen-2].MACD>srcMACDs[mLen-3].MACD{
-		return false
 	}
+	/*if  srcMACDs[mLen-2].MACD>srcMACDs[mLen-3].MACD{
+		return false
+	}*/
 	lastTSIndex:=p.getLastTrendStartIndex()
 	if lastTSIndex<0 {
 		return false
