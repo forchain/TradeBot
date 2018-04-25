@@ -266,7 +266,7 @@ func (p *BinanceDebugEx)Execute(cmd OptRecord) {
 		log.Infof("\n建议您买入 ^_^    原因:%s",reasonStr[cmd.reason])
 		//
 		//定价
-		curAPrice=curRecord.Close
+		//curAPrice=curRecord.Close
 		/*if  curRecord.Close>curRecord.Open{
 			curAPrice=getAverage(lastRecord)
 		}*/
@@ -321,7 +321,7 @@ func (p *BinanceDebugEx)Execute(cmd OptRecord) {
 	case binance.OrderSell:
 		log.Infof("\n建议您买出 ^_^   原因:%s",reasonStr[cmd.reason])
 		//定价
-		curAPrice=curRecord.Close
+		//curAPrice=curRecord.Close
 		curAPrice=getPrecisionFloat(curAPrice,p.CurTP.MinTradePrice)
 		if curAPrice<=p.CurTP.MinTradePrice {
 			return

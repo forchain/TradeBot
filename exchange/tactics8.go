@@ -131,13 +131,13 @@ func (p *Tactics8)getLastHightAndLowIndex(lastIndex int)(float64,float64,error) 
 	if  rLen<=0||lastIndex<0||lastIndex>=rLen{
 		return 0,0,fmt.Errorf("error:len")
 	}
-	//highAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
-	//lowAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
+	highAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
+	lowAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
 
-	highAverage:=p.tactData.CurRecords.Records[rLen-2].High
-	lowAverage:=p.tactData.CurRecords.Records[rLen-2].Low
+	//highAverage:=p.tactData.CurRecords.Records[rLen-2].High
+	//lowAverage:=p.tactData.CurRecords.Records[rLen-2].Low
 
-	/*curAv:=0.0
+	curAv:=0.0
 	for i:=rLen-2;i>lastIndex ;i--  {
 		curAv=getGeometryAverage(&p.tactData.CurRecords.Records[i])
 		if curAv>highAverage{
@@ -146,16 +146,16 @@ func (p *Tactics8)getLastHightAndLowIndex(lastIndex int)(float64,float64,error) 
 		if curAv<lowAverage {
 			lowAverage=curAv
 		}
-	}*/
+	}
 
-	for i:=rLen-2;i>lastIndex ;i--  {
+	/*for i:=rLen-2;i>lastIndex ;i--  {
 		if p.tactData.CurRecords.Records[i].High>highAverage{
 			highAverage=p.tactData.CurRecords.Records[i].High
 		}
 		if p.tactData.CurRecords.Records[i].Low<lowAverage {
 			lowAverage=p.tactData.CurRecords.Records[i].Low
 		}
-	}
+	}*/
 
 	return highAverage,lowAverage,nil
 }
@@ -221,17 +221,17 @@ func (p *Tactics8) processBuy()bool{
 		return false
 	}
 	//
-	isFall:=false
+	/*isFall:=false
 	if  srcMACDs[mLen-2].MACD>srcMACDs[mLen-3].MACD&&
 		srcMACDs[mLen-3].MACD>srcMACDs[mLen-4].MACD{
 		isFall=true
 	}
 	if !isFall {
 		return false
-	}
-	/*if  srcMACDs[mLen-2].MACD<srcMACDs[mLen-3].MACD{
-		return false
 	}*/
+	if  srcMACDs[mLen-2].MACD<srcMACDs[mLen-3].MACD{
+		return false
+	}
 	lastTSIndex:=p.getLastTrendStartIndex()
 	if lastTSIndex<0 {
 		return false
@@ -326,17 +326,17 @@ func (p *Tactics8) processSell()bool{
 		return false
 	}
 	//
-	isFall:=false
+	/*isFall:=false
 	if  srcMACDs[mLen-2].MACD<srcMACDs[mLen-3].MACD&&
 		srcMACDs[mLen-3].MACD<srcMACDs[mLen-4].MACD{
 		isFall=true
 	}
 	if !isFall {
 		return false
-	}
-	/*if  srcMACDs[mLen-2].MACD>srcMACDs[mLen-3].MACD{
-		return false
 	}*/
+	if  srcMACDs[mLen-2].MACD>srcMACDs[mLen-3].MACD{
+		return false
+	}
 	lastTSIndex:=p.getLastTrendStartIndex()
 	if lastTSIndex<0 {
 		return false
