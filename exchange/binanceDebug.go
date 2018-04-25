@@ -139,6 +139,7 @@ func (p *BinanceDebugEx) Update() error  {
 			return fmt.Errorf("调试完毕")
 		}
 	}
+
 	//
 	return nil
 }
@@ -256,7 +257,7 @@ func (p *BinanceDebugEx)Execute(cmd OptRecord) {
 	var curAPrice float64
 	if cmd.price>0 {
 		curAPrice=cmd.price
-		log.Infof("使用自定义价格：%f   当前市价：%f",curAPrice,curRecord.Close)
+		log.Infof("使用自定义价格：%f   当前市价：%f",curAPrice,curRecord.Open)
 	}else {
 		curAPrice=curRecord.Open
 	}

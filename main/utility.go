@@ -8,6 +8,7 @@ import (
 	"github.com/forchain/TradeBot/exchange"
 	"time"
 	"flag"
+	"github.com/forchain/TradeBot/helpers"
 )
 
 
@@ -25,6 +26,7 @@ type ExchangeConfig struct {
 	StopLoss float64
 	StopGain float64
 	CurTP exchange.TradePairConfig
+	MailCfg helpers.MailInfo
 }
 
 
@@ -89,6 +91,7 @@ func Init() bool {
 			log.Infof("设置结束调试时间失败，将调试所有记录")
 		}
 	}
+	helpers.MInfo=&ExchangeC.MailCfg
 	//配置交易策略模块
 
 	curExchange,err=getExchangeInstance()
@@ -129,6 +132,10 @@ func update() bool{
 	err:=curExchange.Update()
 	if err!=nil {
 		log.Errorln(err)
+		if !ExchangeC.IsDebug {
+			helpers.DispatchAbnormalExitNotice(logFileName)
+		}
+
 		return false
 	}
 	//
