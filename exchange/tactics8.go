@@ -174,6 +174,7 @@ func (p *Tactics8) processBuy()bool{
 
 
 	rLen:=len(p.tactData.CurRecords.Records)
+	rLen--
 	if  rLen<=0{
 		return false
 	}
@@ -280,6 +281,7 @@ func (p *Tactics8) processBuy()bool{
 func (p *Tactics8) processSell()bool{
 
 	rLen:=len(p.tactData.CurRecords.Records)
+	rLen--
 	if  rLen<=0{
 		return false
 	}
