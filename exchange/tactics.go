@@ -1,15 +1,15 @@
 package exchange
 
 import (
-	"time"
 	"github.com/Akagi201/utilgo/enums"
+	"time"
 )
 
 type TacticsData struct {
 	CurRecords *ExchangeRecords
-	CurMACDs *MACDDatas
-	Excha IExchange
-	account *Account
+	CurMACDs   *MACDDatas
+	Excha      IExchange
+	account    *Account
 }
 
 type ITactics interface {
@@ -18,36 +18,35 @@ type ITactics interface {
 	GetID() int
 }
 
-const (
+const ()
 
-)
 type OptRecord struct {
-	optType int
-	reason int
-	time time.Time
-	orderID int64
+	optType  int
+	reason   int
+	time     time.Time
+	orderID  int64
 	indexOpt int64
-	price float64
+	price    float64
 }
 
 var (
-	OrderStatus   enums.Enum
-	OrderNew  = OrderStatus.Iota("NEW")
-	OrderPartiallyFilled=OrderStatus.Iota("PARTIALLY_FILLED")
-	OrderFilled = OrderStatus.Iota("FILLED")
-	OrderCanceled=OrderStatus.Iota("CANCELED")
-	OrderRejected=OrderStatus.Iota("REJECTED")
-	OrderExpired=OrderStatus.Iota("EXPIRED")
+	OrderStatus          enums.Enum
+	OrderNew             = OrderStatus.Iota("NEW")
+	OrderPartiallyFilled = OrderStatus.Iota("PARTIALLY_FILLED")
+	OrderFilled          = OrderStatus.Iota("FILLED")
+	OrderCanceled        = OrderStatus.Iota("CANCELED")
+	OrderRejected        = OrderStatus.Iota("REJECTED")
+	OrderExpired         = OrderStatus.Iota("EXPIRED")
 )
 
 var (
-	TradeType   enums.Enum
-	TradeBuy= TradeType.Iota("buy")
+	TradeType enums.Enum
+	TradeBuy  = TradeType.Iota("buy")
 	TradeSell = TradeType.Iota("sell")
 )
 
 const (
-	DIF_UP_0=iota
+	DIF_UP_0 = iota
 	DIF_DOWN_0
 	FALLAWAY_TOP
 	FALLAWAY_BOTTOM
@@ -57,4 +56,6 @@ const (
 	STOP_GAIN
 )
 
-var reasonStr=[]string{"DIF线上穿MACD 0轴","DIF线下穿MACD 0轴","顶背离","底背离","黄金金叉","黄金死叉","当前价已经低于止损价","接回仓位"}
+var reasonStr = []string{"DIF线上穿MACD 0轴", "DIF线下穿MACD 0轴", "顶背离", "底背离", "黄金金叉", "黄金死叉", "当前价已经低于止损价", "接回仓位"}
+
+var TacticsMap map[int]ITactics = make(map[int]ITactics)
