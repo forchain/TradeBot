@@ -37,6 +37,8 @@ func (p *Tactics2)Update(){
 func (p *Tactics2) denoiseMACD(){
 	//copy
 	mLen:=len(*p.tactData.CurMACDs)
+
+	//-------------
 	if mLen<=5 {
 		log.Infoln("没有可用的MACD数据")
 		return
@@ -148,6 +150,9 @@ func (p *Tactics2) denoiseMACD(){
 /*DIF突破0轴*/
 func (p *Tactics2) crossOverByDIF() bool{
 	mLen:=len(*p.tactData.CurMACDs)
+	//过滤掉最后一个数据
+	mLen--
+	//-------------
 	if mLen<=0 {
 		log.Infoln("没有可用的MACD数据")
 		return false
@@ -177,6 +182,9 @@ func (p *Tactics2) crossOverByDIF() bool{
 /*DIF背离*/
 func (p *Tactics2) fallAwayByDIF() bool{
 	mLen:=len(*p.tactData.CurMACDs)
+	//过滤掉最后一个数据
+	mLen--
+	//-------------
 	if mLen<=0 {
 		log.Infoln("没有可用的MACD数据")
 		return false

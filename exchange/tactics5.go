@@ -38,6 +38,9 @@ func (p *Tactics5)Update(){
 /*DIF突破0轴*/
 func (p *Tactics5) crossOver0ByDIF() bool{
 	mLen:=len(*p.tactData.CurMACDs)
+	//过滤掉最后一个数据
+	mLen--
+	//-------------
 	if mLen<=0 {
 		log.Infoln("没有可用的MACD数据")
 		return false

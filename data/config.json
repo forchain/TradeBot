@@ -6,17 +6,17 @@
     "Tactics": 1,
     "LogDir": "data/",
     "IsDebug": true,
-    "StopLoss": 1.0,
-    "StopGain": 1.0,
+    "StopLoss": 0.9,
+    "StopGain": 0.9,
     "CurTP": {
         "Name": "ETH-USDT",
-        "OptFrequency": 0,
+        "OptFrequency": 2,
         "MinTradeNum": 0.00001,
         "MinOrderTotalPrice": 10,
         "MinTradePrice": 0.01
     },
     "MailCfg": {
-        "Adrress": "youmail@163.com",
+        "Adrress": "",
         "Password": "123456",
         "SMTP": "smtp.163.com",
         "SMTPPort": 25

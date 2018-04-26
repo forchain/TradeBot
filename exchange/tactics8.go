@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-const CAP_FEE float64=5.0
+const CAP_FEE float64=2
 
 type Tactics8 struct {
 	tactData *TacticsData
@@ -131,13 +131,13 @@ func (p *Tactics8)getLastHightAndLowIndex(lastIndex int)(float64,float64,error) 
 	if  rLen<=0||lastIndex<0||lastIndex>=rLen{
 		return 0,0,fmt.Errorf("error:len")
 	}
-	highAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
-	lowAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
+	//highAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
+	//lowAverage:=getGeometryAverage(&p.tactData.CurRecords.Records[rLen-2])
 
-	//highAverage:=p.tactData.CurRecords.Records[rLen-2].High
-	//lowAverage:=p.tactData.CurRecords.Records[rLen-2].Low
+	highAverage:=p.tactData.CurRecords.Records[rLen-2].High
+	lowAverage:=p.tactData.CurRecords.Records[rLen-2].Low
 
-	curAv:=0.0
+	/*curAv:=0.0
 	for i:=rLen-2;i>lastIndex ;i--  {
 		curAv=getGeometryAverage(&p.tactData.CurRecords.Records[i])
 		if curAv>highAverage{
@@ -146,16 +146,16 @@ func (p *Tactics8)getLastHightAndLowIndex(lastIndex int)(float64,float64,error) 
 		if curAv<lowAverage {
 			lowAverage=curAv
 		}
-	}
+	}*/
 
-	/*for i:=rLen-2;i>lastIndex ;i--  {
+	for i:=rLen-2;i>lastIndex ;i--  {
 		if p.tactData.CurRecords.Records[i].High>highAverage{
 			highAverage=p.tactData.CurRecords.Records[i].High
 		}
 		if p.tactData.CurRecords.Records[i].Low<lowAverage {
 			lowAverage=p.tactData.CurRecords.Records[i].Low
 		}
-	}*/
+	}
 
 	return highAverage,lowAverage,nil
 }
@@ -217,9 +217,6 @@ func (p *Tactics8) processBuy()bool{
 	if tradeOptIndex==-1 {
 		return false
 	}
-	if tradeOptIndex==-1 {
-		return false
-	}
 	//
 	/*isFall:=false
 	if  srcMACDs[mLen-2].MACD>srcMACDs[mLen-3].MACD&&
@@ -244,14 +241,14 @@ func (p *Tactics8) processBuy()bool{
 		highAverage,lowAverage=lowAverage,highAverage
 	}
 	//
-	zhchTopPrice:=(highAverage-trade.Price)/2
+	zhchTopPrice:=(highAverage-trade.Price)*p.tactData.Excha.GetExchange().StopLoss
 	if zhchTopPrice>=0 {
 		zhchTopPrice+=trade.Price
 	}else {
 		zhchTopPrice=highAverage
 	}
 	//
-	zhchLowPrice:=(trade.Price-lowAverage)/2
+	zhchLowPrice:=(trade.Price-lowAverage)*(1-p.tactData.Excha.GetExchange().StopLoss)
 	if zhchLowPrice>=0 {
 		zhchLowPrice+=lowAverage
 	}else {
@@ -266,10 +263,12 @@ func (p *Tactics8) processBuy()bool{
 		p.tactData.CurRecords.Records[rLen-1].Close>=zhchLowPrice{
 
 		optCmd=&OptRecord{optType:binance.OrderBuy,reason:STOP_GAIN}
-	}else if p.tactData.CurRecords.Records[rLen-1].Close < highAverage &&
+	}else if p.tactData.CurRecords.Records[rLen-1].Close < zhchTopPrice &&
 		p.tactData.CurRecords.Records[rLen-1].Close>=capPrice{
 
 		optCmd=&OptRecord{optType:binance.OrderBuy,reason:STOP_GAIN,price:capPrice}
+	}else if p.tactData.CurRecords.Records[rLen-1].Close >= zhchTopPrice{
+		optCmd=&OptRecord{optType:binance.OrderBuy,reason:STOP_GAIN}
 	}
 
 	if optCmd!=nil {
@@ -349,14 +348,14 @@ func (p *Tactics8) processSell()bool{
 		highAverage,lowAverage=lowAverage,highAverage
 	}
 	//
-	zhchTopPrice:=(highAverage-trade.Price)/2
+	zhchTopPrice:=(highAverage-trade.Price)*p.tactData.Excha.GetExchange().StopLoss
 	if zhchTopPrice>=0 {
 		zhchTopPrice+=trade.Price
 	}else {
 		zhchTopPrice=highAverage
 	}
 	//
-	zhchLowPrice:=(trade.Price-lowAverage)/2
+	zhchLowPrice:=(trade.Price-lowAverage)*(1-p.tactData.Excha.GetExchange().StopLoss)
 	if zhchLowPrice>=0 {
 		zhchLowPrice+=lowAverage
 	}else {
@@ -372,10 +371,10 @@ func (p *Tactics8) processSell()bool{
 
 		optCmd=&OptRecord{optType:binance.OrderSell,reason:STOP_LOSS}
 	}else if p.tactData.CurRecords.Records[rLen-1].Close <= capPrice &&
-		p.tactData.CurRecords.Records[rLen-1].Close>lowAverage{
+		p.tactData.CurRecords.Records[rLen-1].Close>zhchLowPrice{
 
 		optCmd=&OptRecord{optType:binance.OrderSell,reason:STOP_LOSS,price:capPrice}
-	}else if p.tactData.CurRecords.Records[rLen-1].Close <= lowAverage{
+	}else if p.tactData.CurRecords.Records[rLen-1].Close <= zhchLowPrice{
 		optCmd=&OptRecord{optType:binance.OrderSell,reason:STOP_LOSS}
 	}
 

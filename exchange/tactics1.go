@@ -155,6 +155,9 @@ func (p *Tactics1) crossOverByDIF() bool{
 
 	srcMACDs:=*p.tactData.CurMACDs
 
+	//过滤掉最后一个数据
+	mLen--
+	//-------------
 	if mLen<4 {
 		return false
 	}
@@ -177,6 +180,9 @@ func (p *Tactics1) crossOverByDIF() bool{
 /*DIF背离*/
 func (p *Tactics1) fallAwayByDIF() bool{
 	mLen:=len(*p.tactData.CurMACDs)
+	//过滤掉最后一个数据
+	mLen--
+
 	if mLen<=0 {
 		log.Infoln("没有可用的MACD数据")
 		return false
