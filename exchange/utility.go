@@ -415,10 +415,18 @@ func PrintDebugInfo(p *BinanceDebugEx){
 		balance:=p.account.getBalance(p.CurTP.GetQuote())
 		for _,x:=range p.account.trades{
 			ownB:=p.account.getOwnBaseByTime(x.Time)
-			baV:=p.account.getBalanceByTime(x.Time)+firstA
-			totalFee+=x.Amount*x.Price*p.Fee
+			baV:=p.account.getBalanceByTime(x.Time)+firstA+ownB*x.Price
+			/*baV,err:=strconv.ParseFloat(x.Raw,64)
+			if err!=nil {
+				baV=0
+			}*/
+			if x.Type==TradeType.String(TradeBuy) {
+				totalFee+=x.Commission
+			}else {
+				totalFee+=x.Commission*x.Price
+			}
 			showStr+=fmt.Sprintf("%16d%7s%20g%20.16g%20g%20g%20.16g%20.10g%20.10g%22s\n",x.ID,x.Type,x.Amount,x.Price,
-				x.Amount*x.Price*p.Fee,ownB,ownB*x.Price,baV,baV+ownB*x.Price-firstA,
+				x.Amount*x.Price*p.Fee,ownB,ownB*x.Price,baV,baV-firstA,
 				x.Time.Format("2006-01-02 15:04:05"))
 		}
 
@@ -598,10 +606,15 @@ func PrintAnalysisInfo(p *BinanceEx){
 		balance:=p.account.getBalance(p.CurTP.GetQuote())
 		for _,x:=range p.account.trades{
 			ownB:=p.account.getOwnBaseByTime(x.Time)+firstB
-			baV:=p.account.getBalanceByTime(x.Time)+firstA
-			totalFee+=x.Commission
+			baV:=p.account.getBalanceByTime(x.Time)+firstA+ownB*x.Price+firstBMoney
+			if x.Type==TradeType.String(TradeBuy) {
+				totalFee+=x.Commission
+			}else {
+				totalFee+=x.Commission*x.Price
+			}
+
 			showStr+=fmt.Sprintf("%16d%7s%20g%20.16g%20g%20g%20.16g%20.10g%20.10g%22s\n",x.ID,x.Type,x.Amount,x.Price,
-				x.Commission,ownB,ownB*x.Price,baV,baV+ownB*x.Price-firstA-firstBMoney,
+				x.Commission,ownB,ownB*x.Price,baV,baV-firstA-firstBMoney,
 				x.Time.Format("2006-01-02 15:04:05"))
 
 		}

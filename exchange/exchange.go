@@ -489,10 +489,12 @@ func (p *Account)getBalanceByTime(time time.Time) float64{
 		if x.Time.Equal(time)||x.Time.Before(time) {
 			if x.Type==TradeType.String(TradeBuy) {
 				result-=x.Amount*x.Price
+				result-=x.Commission
 			}else {
 				result+=x.Amount*x.Price
+				result-=x.Commission*x.Price
 			}
-			result-=x.Commission
+
 		}
 
 	}
@@ -505,6 +507,7 @@ func (p *Account)getOwnBase() float64{
 			result+=x.Amount
 		}else {
 			result-=x.Amount
+			result-=x.Commission
 		}
 	}
 	return result
@@ -516,7 +519,8 @@ func (p *Account)getOwnBaseByTime(time time.Time) float64{
 			if x.Type==TradeType.String(TradeBuy) {
 				result+=x.Amount
 			}else {
-				result-=x.Amount
+				result -= x.Amount
+				result-=x.Commission
 			}
 		}
 
@@ -571,10 +575,10 @@ func (p *Account)refreshTrades(trades []model.Trade){
 			}
 		}
 		if !has {
-			if x.Type==binance.OrderSide.String(binance.OrderSell){
+			/*if x.Type==binance.OrderSide.String(binance.OrderSell){
 				x.Commission=x.Commission*x.Price
 				x.CommissionAsset=x.CommissionAsset+"->原始"
-			}
+			}*/
 
 			p.trades=append(p.trades,x)
 			log.Infof("添加trade:%+v",x)

@@ -425,8 +425,8 @@ func (p *BinanceDebugEx)updateMyOrders() {
 
 						//成功促成交易
 						trade:=model.Trade{x.ID,TradeType.String(TradeBuy),x.Price,
-						x.DealAmount,opt.time,x.Amount*x.Price*p.Fee,p.CurTP.GetQuote(),
-						x.ID,""}
+						x.DealAmount,p.serverTime,x.Amount*x.Price*p.Fee,p.CurTP.GetQuote(),
+						x.ID,fmt.Sprintf("%f",balance.Free)}
 						p.account.trades=append(p.account.trades, trade)
 						//
 						log.Infof("买入 [%f] %s,花费 [%f] %s",x.DealAmount,p.CurTP.GetBase(),
@@ -440,8 +440,8 @@ func (p *BinanceDebugEx)updateMyOrders() {
 						bbalance.Free-=(x.Amount+x.Amount*p.Fee)
 
 						trade:=model.Trade{x.ID,TradeType.String(TradeSell),x.Price,
-							x.DealAmount,opt.time,x.Amount*x.Price*p.Fee,
-							p.CurTP.GetQuote(),x.ID,""}
+							x.DealAmount,p.serverTime,x.Amount*p.Fee,
+							p.CurTP.GetQuote(),x.ID,fmt.Sprintf("%f",balance.Free)}
 						p.account.trades=append(p.account.trades, trade)
 
 						log.Infof("卖出 [%f] %s,收入 [%f] %s",x.DealAmount,p.CurTP.GetBase(),
