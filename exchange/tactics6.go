@@ -8,7 +8,8 @@ import (
 )
 
 func init() {
-	TacticsMap[6] = &Tactics6{}
+	tact := &Tactics6{}
+	TacticsMap[tact.GetID()] = tact
 }
 
 type Tactics6 struct {

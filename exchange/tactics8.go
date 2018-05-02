@@ -10,7 +10,8 @@ import (
 const CAP_FEE float64 = 2
 
 func init() {
-	TacticsMap[8] = &Tactics8{}
+	tact := &Tactics8{}
+	TacticsMap[tact.GetID()] = tact
 }
 
 type Tactics8 struct {
